@@ -24,7 +24,7 @@ function calculatePreferencePenalty(team: Team): number {
     if (
       player.primary &&
       player.assignedRole &&
-      player.primary !== player.assignedRole
+      !player.primary.includes(player.assignedRole)
     ) {
       // 선호 역할과 배정 역할이 다르면 패널티 (스킬 점수의 10%)
       return penalty + getSkillSafe(player, player.assignedRole) * 0.1;

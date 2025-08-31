@@ -63,9 +63,13 @@ export function roleBalancedAssign(
       canPlayRole(player, role)
     );
 
-    // 선호자와 나머지로 분류
-    const preferred = candidates.filter((player) => player.primary === role);
-    const others = candidates.filter((player) => player.primary !== role);
+    // 선호자와 나머지로 분류 (primary가 배열이므로 includes 사용)
+    const preferred = candidates.filter(
+      (player) => player.primary && player.primary.includes(role)
+    );
+    const others = candidates.filter(
+      (player) => !player.primary || !player.primary.includes(role)
+    );
 
     // 각 그룹을 스킬 내림차순으로 정렬
     preferred.sort((a, b) => getSkillSafe(b, role) - getSkillSafe(a, role));

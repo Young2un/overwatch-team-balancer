@@ -27,7 +27,7 @@ export interface Player {
   id: string;
   name: string;
   roles: Role[]; // 가능한 역할(1+)
-  primary?: Role; // 선호 역할(옵션)
+  primary?: Role[]; // 선호 역할들(옵션, 여러 개 가능)
   skills: Partial<Record<Role, number>>; // 역할별 스킬 (입력된 역할만 존재)
   assignedRole?: Role; // 배정된 역할 (매치 결과에서만 사용)
 }

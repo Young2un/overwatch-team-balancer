@@ -63,6 +63,7 @@ export function performRandomBanPick(
   settings: RandomBanPick
 ): string[] {
   if (!settings.enabled) {
+    console.log("벤픽 비활성화됨");
     return [];
   }
 
@@ -75,9 +76,18 @@ export function performRandomBanPick(
     allHeroes.length
   );
 
+  console.log("벤픽 설정:", settings);
+  console.log("총 밴 수:", totalBans);
+
+  // 더 랜덤한 시드 생성 (현재 시간 + 원본 시드 + 랜덤 요소)
+  const randomSeed = seed + Date.now() + Math.floor(Math.random() * 10000);
+
   // 시드 기반으로 영웅들을 셔플하고 상위 N개를 밴
-  const shuffledHeroes = seededShuffle(allHeroes, seed);
-  return shuffledHeroes.slice(0, totalBans);
+  const shuffledHeroes = seededShuffle(allHeroes, randomSeed);
+  const bannedHeroes = shuffledHeroes.slice(0, totalBans);
+
+  console.log("밴된 영웅들:", bannedHeroes);
+  return bannedHeroes;
 }
 
 /**

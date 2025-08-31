@@ -5,7 +5,7 @@ import { summarizeBanPick } from "@/lib/match/banpick";
 import { improveBalance } from "@/lib/match/improve";
 import { getMapTypeDescription } from "@/lib/match/maps";
 import { MatchResult, Player, RandomBanPick, Role } from "@/lib/match/types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 // 샘플 플레이어 데이터
 const SAMPLE_PLAYERS: Player[] = [
@@ -13,70 +13,70 @@ const SAMPLE_PLAYERS: Player[] = [
     id: "1",
     name: "김영은",
     roles: ["SUPPORT", "DPS"],
-    primary: "TANK",
+    primary: ["TANK"],
     skills: { TANK: 3500, DPS: 3200 },
   },
   {
     id: "2",
     name: "DPSPro",
     roles: ["DPS", "TANK"],
-    primary: "DPS",
+    primary: ["DPS"],
     skills: { DPS: 3600, TANK: 3000 },
   },
   {
     id: "3",
     name: "장승원",
     roles: ["SUPPORT"],
-    primary: "SUPPORT",
+    primary: ["SUPPORT"],
     skills: { SUPPORT: 3400 },
   },
   {
     id: "4",
     name: "오현진",
     roles: ["TANK", "DPS", "SUPPORT"],
-    primary: "DPS",
+    primary: ["DPS"],
     skills: { TANK: 3100, DPS: 3300, SUPPORT: 2900 },
   },
   {
     id: "5",
     name: "신윤수",
     roles: ["SUPPORT", "DPS"],
-    primary: "SUPPORT",
+    primary: ["SUPPORT"],
     skills: { SUPPORT: 3500, DPS: 2800 },
   },
   {
     id: "6",
     name: "이호균",
     roles: ["TANK", "SUPPORT"],
-    primary: "TANK",
+    primary: ["TANK"],
     skills: { TANK: 3200, SUPPORT: 3000 },
   },
   {
     id: "7",
     name: "고은별",
     roles: ["DPS", "SUPPORT"],
-    primary: "DPS",
+    primary: ["DPS"],
     skills: { DPS: 3400, SUPPORT: 3100 },
   },
   {
     id: "8",
     name: "김제휘",
     roles: ["SUPPORT", "TANK"],
-    primary: "SUPPORT",
+    primary: ["SUPPORT"],
     skills: { SUPPORT: 3300, TANK: 2900 },
   },
   {
     id: "9",
     name: "권재민",
     roles: ["SUPPORT", "TANK"],
-    primary: "SUPPORT",
+    primary: ["SUPPORT"],
     skills: { SUPPORT: 3300, TANK: 2900 },
   },
   {
     id: "10",
-    name: "김제휘",
+    name: "천스터",
     roles: ["SUPPORT", "TANK"],
-    primary: "SUPPORT",
+    primary: ["SUPPORT"],
     skills: { SUPPORT: 3300, TANK: 2900 },
   },
 ];
@@ -94,10 +94,14 @@ export default function ScrimPage() {
     maxBansPerPosition: 2,
   });
 
-  // 플레이어 변경 시 자동 재계산
-  useEffect(() => {
+  // 매치 생성 함수
+  const generateMatch = () => {
     if (players.length > 0) {
+      console.log("매치 생성 시작");
+      console.log("벤픽 설정:", banPickSettings);
       const matchResult = roleBalancedAssign(players, seed, banPickSettings);
+      console.log("매치 결과:", matchResult);
+      console.log("밴된 영웅들:", matchResult.bannedHeroes);
       if (enableImprovement) {
         const improvedResult = improveBalance(matchResult);
         setResult(improvedResult);
@@ -105,7 +109,7 @@ export default function ScrimPage() {
         setResult(matchResult);
       }
     }
-  }, [players, seed, enableImprovement, banPickSettings]);
+  };
 
   const addPlayer = () => {
     const newPlayer: Player = {
@@ -157,12 +161,17 @@ export default function ScrimPage() {
     );
   };
 
+  const generateRandomSeed = () => {
+    const randomSeed = Math.floor(Math.random() * 1000000);
+    setSeed(randomSeed);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            오버워치 팀 밸런스 생성기
+            워니버스 오버워치 팀 밸런스 생성기
           </h1>
           <p className="text-lg text-gray-600">
             공정하고 균형잡힌 팀을 만들어보세요
@@ -174,6 +183,12 @@ export default function ScrimPage() {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold text-gray-900">설정</h2>
             <div className="flex items-center space-x-4">
+              <button
+                onClick={generateMatch}
+                className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+              >
+                매치 생성
+              </button>
               <label className="flex items-center">
                 <input
                   type="checkbox"
@@ -199,6 +214,13 @@ export default function ScrimPage() {
                   onChange={(e) => setSeed(parseInt(e.target.value) || 0)}
                   className="w-20 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 />
+                <button
+                  onClick={generateRandomSeed}
+                  className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  title="랜덤 시드 생성"
+                >
+                  랜덤 돌리기
+                </button>
               </div>
             </div>
           </div>
@@ -332,12 +354,18 @@ export default function ScrimPage() {
                     {ROLES.map((role) => (
                       <label key={role} className="flex items-center">
                         <input
-                          type="radio"
-                          name={`primary-${player.id}`}
-                          checked={player.primary === role}
-                          onChange={() =>
-                            updatePlayer(player.id, { primary: role })
-                          }
+                          type="checkbox"
+                          checked={player.primary?.includes(role) || false}
+                          onChange={() => {
+                            const currentPrimary = player.primary || [];
+                            const newPrimary = currentPrimary.includes(role)
+                              ? currentPrimary.filter((r) => r !== role)
+                              : [...currentPrimary, role];
+                            updatePlayer(player.id, {
+                              primary:
+                                newPrimary.length > 0 ? newPrimary : undefined,
+                            });
+                          }}
                           className="border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <span className="ml-2 text-sm text-gray-700">
@@ -408,23 +436,29 @@ export default function ScrimPage() {
             )}
 
             {/* 랜덤벤픽 결과 */}
-            {result.bannedHeroes && result.bannedHeroes.length > 0 && (
+            {result.bannedHeroes && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <h3 className="text-lg font-medium text-red-800 mb-2">
-                  🚫 밴된 영웅들
+                  🚫 밴된 영웅들 ({result.bannedHeroes.length}개)
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                  {result.bannedHeroes.map((hero, index) => (
-                    <div
-                      key={index}
-                      className="bg-white rounded px-3 py-2 border border-red-100"
-                    >
-                      <span className="text-sm font-medium text-red-900">
-                        {hero}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                {result.bannedHeroes.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                    {result.bannedHeroes.map((hero, index) => (
+                      <div
+                        key={index}
+                        className="bg-white rounded px-3 py-2 border border-red-100"
+                      >
+                        <span className="text-sm font-medium text-red-900">
+                          {hero}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-red-700 text-sm">
+                    밴된 영웅이 없습니다.
+                  </div>
+                )}
                 {(() => {
                   const summary = summarizeBanPick(result.bannedHeroes);
                   return (
