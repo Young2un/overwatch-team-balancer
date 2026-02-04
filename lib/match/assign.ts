@@ -1,4 +1,4 @@
-import { performRandomBanPick } from "./banpick";
+// import { performRandomBanPick } from "./banpick"; // 나중에 랜덤벤픽 추가 시 복구
 import { selectRandomMap } from "./maps";
 import { seededShuffle } from "./shuffle";
 import { canPlayRole, getSkillSafe } from "./skill";
@@ -163,10 +163,11 @@ export function roleBalancedAssign(
   // 전장 선택
   const selectedMap = selectRandomMap(seed);
 
-  // 랜덤벤픽 수행
-  const bannedHeroes = banPickSettings
-    ? performRandomBanPick(seed, banPickSettings)
-    : [];
+  // 랜덤벤픽 수행 (나중에 랜덤벤픽 추가 시 복구)
+  // const bannedHeroes = banPickSettings
+  //   ? performRandomBanPick(seed, banPickSettings)
+  //   : [];
+  const bannedHeroes: string[] = [];
 
   // 경고 메시지 생성
   const warnings: string[] = [];

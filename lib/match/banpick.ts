@@ -38,6 +38,7 @@ export const HEROES: Record<Role, string[]> = {
     "에코",
     "벤처",
     "프레야",
+    "벤데타",
   ],
   SUPPORT: [
     "아나",
@@ -60,7 +61,7 @@ export const HEROES: Record<Role, string[]> = {
  */
 export function performRandomBanPick(
   seed: number,
-  settings: RandomBanPick
+  settings: RandomBanPick,
 ): string[] {
   if (!settings.enabled) {
     console.log("벤픽 비활성화됨");
@@ -73,7 +74,7 @@ export function performRandomBanPick(
   const totalBans = Math.min(
     settings.maxBansPerRole * 3, // 역할당 최대 밴 수 * 3개 역할
     settings.maxBansPerPosition * 4, // 포지션당 최대 밴 수 * 4개 포지션
-    allHeroes.length
+    allHeroes.length,
   );
 
   console.log("벤픽 설정:", settings);
@@ -94,7 +95,7 @@ export function performRandomBanPick(
  * 역할별로 밴된 영웅을 분류합니다.
  */
 export function categorizeBannedHeroes(
-  bannedHeroes: string[]
+  bannedHeroes: string[],
 ): Record<Role, string[]> {
   const categorized: Record<Role, string[]> = {
     TANK: [],

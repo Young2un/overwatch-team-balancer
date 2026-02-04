@@ -1,11 +1,13 @@
 "use client";
 
 import { roleBalancedAssign } from "@/lib/match/assign";
-import { summarizeBanPick } from "@/lib/match/banpick";
 import { improveBalance } from "@/lib/match/improve";
 import { getMapTypeDescription } from "@/lib/match/maps";
-import { MatchResult, Player, RandomBanPick, Role } from "@/lib/match/types";
+import { MatchResult, Player, Role } from "@/lib/match/types";
 import { useState } from "react";
+// ----- 랜덤벤픽 사용 시 아래 2줄 + state 블록 + generateMatch 인자 + 설정/결과 컴포넌트 주석 해제, lib/match/assign.ts 벤픽 로직도 복구 -----
+// import { BanPickSettingsSection, BanPickResultSection } from "./BanPickSection";
+// import { RandomBanPick } from "@/lib/match/types";
 
 // 샘플 플레이어 데이터
 const SAMPLE_PLAYERS: Player[] = [
@@ -88,20 +90,19 @@ export default function ScrimPage() {
   const [seed, setSeed] = useState<number>(42);
   const [result, setResult] = useState<MatchResult | null>(null);
   const [enableImprovement, setEnableImprovement] = useState<boolean>(true);
-  const [banPickSettings, setBanPickSettings] = useState<RandomBanPick>({
-    enabled: true,
-    maxBansPerRole: 2,
-    maxBansPerPosition: 2,
-  });
+  // 랜덤벤픽 사용 시 아래 state 주석 해제
+  // const [banPickSettings, setBanPickSettings] = useState<RandomBanPick>({
+  //   enabled: true,
+  //   maxBansPerRole: 2,
+  //   maxBansPerPosition: 2,
+  // });
 
   // 매치 생성 함수
   const generateMatch = () => {
     if (players.length > 0) {
       console.log("매치 생성 시작");
-      console.log("벤픽 설정:", banPickSettings);
-      const matchResult = roleBalancedAssign(players, seed, banPickSettings);
+      const matchResult = roleBalancedAssign(players, seed); // 랜덤벤픽 사용 시: roleBalancedAssign(players, seed, banPickSettings)
       console.log("매치 결과:", matchResult);
-      console.log("밴된 영웅들:", matchResult.bannedHeroes);
       if (enableImprovement) {
         const improvedResult = improveBalance(matchResult);
         setResult(improvedResult);
@@ -143,7 +144,7 @@ export default function ScrimPage() {
           return { ...p, skills: newSkills };
         }
         return p;
-      })
+      }),
     );
   };
 
@@ -157,7 +158,7 @@ export default function ScrimPage() {
           return { ...p, roles: newRoles };
         }
         return p;
-      })
+      }),
     );
   };
 
@@ -171,10 +172,10 @@ export default function ScrimPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            워니버스 오버워치 팀 밸런스 생성기
+            오버워치 팀 밸런스 생성기
           </h1>
           <p className="text-lg text-gray-600">
-            공정하고 균형잡힌 팀을 만들어보세요
+            공정하고 균형잡힌 팀을 만들어보세요. 건강하게 즐겜합시당!
           </p>
         </div>
 
@@ -225,66 +226,8 @@ export default function ScrimPage() {
             </div>
           </div>
 
-          {/* 랜덤벤픽 설정 */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              랜덤벤픽 설정
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={banPickSettings.enabled}
-                  onChange={(e) =>
-                    setBanPickSettings({
-                      ...banPickSettings,
-                      enabled: e.target.checked,
-                    })
-                  }
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm text-gray-700">
-                  랜덤벤픽 사용
-                </span>
-              </label>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  역할당 최대 밴 수:
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max="5"
-                  value={banPickSettings.maxBansPerRole}
-                  onChange={(e) =>
-                    setBanPickSettings({
-                      ...banPickSettings,
-                      maxBansPerRole: parseInt(e.target.value) || 0,
-                    })
-                  }
-                  className="w-20 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  포지션당 최대 밴 수:
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max="4"
-                  value={banPickSettings.maxBansPerPosition}
-                  onChange={(e) =>
-                    setBanPickSettings({
-                      ...banPickSettings,
-                      maxBansPerPosition: parseInt(e.target.value) || 0,
-                    })
-                  }
-                  className="w-20 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-          </div>
+          {/* 랜덤벤픽 사용 시 아래 한 줄 주석 해제 */}
+          {/* <BanPickSettingsSection value={banPickSettings} onChange={setBanPickSettings} /> */}
 
           {/* 플레이어 목록 */}
           <div className="space-y-4">
@@ -435,73 +378,8 @@ export default function ScrimPage() {
               </div>
             )}
 
-            {/* 랜덤벤픽 결과 */}
-            {result.bannedHeroes && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <h3 className="text-lg font-medium text-red-800 mb-2">
-                  🚫 밴된 영웅들 ({result.bannedHeroes.length}개)
-                </h3>
-                {result.bannedHeroes.length > 0 ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                    {result.bannedHeroes.map((hero, index) => (
-                      <div
-                        key={index}
-                        className="bg-white rounded px-3 py-2 border border-red-100"
-                      >
-                        <span className="text-sm font-medium text-red-900">
-                          {hero}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-red-700 text-sm">
-                    밴된 영웅이 없습니다.
-                  </div>
-                )}
-                {(() => {
-                  const summary = summarizeBanPick(result.bannedHeroes);
-                  return (
-                    <div className="mt-3 pt-3 border-t border-red-200">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <span className="font-medium text-red-800">
-                            총 밴 수:
-                          </span>
-                          <span className="ml-2 text-red-700">
-                            {summary.totalBans}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-medium text-red-800">
-                            탱커:
-                          </span>
-                          <span className="ml-2 text-red-700">
-                            {summary.byRole.TANK}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-medium text-red-800">
-                            딜러:
-                          </span>
-                          <span className="ml-2 text-red-700">
-                            {summary.byRole.DPS}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-medium text-red-800">
-                            힐러:
-                          </span>
-                          <span className="ml-2 text-red-700">
-                            {summary.byRole.SUPPORT}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-            )}
+            {/* 랜덤벤픽 사용 시 아래 한 줄 주석 해제 */}
+            {/* {result.bannedHeroes && result.bannedHeroes.length > 0 && <BanPickResultSection bannedHeroes={result.bannedHeroes} />} */}
 
             {/* 경고 메시지 */}
             {result.warnings.length > 0 && (
@@ -623,7 +501,7 @@ export default function ScrimPage() {
                 <div>
                   <div className="text-2xl font-bold text-gray-900">
                     {Math.abs(
-                      result.teamA.totalSkill - result.teamB.totalSkill
+                      result.teamA.totalSkill - result.teamB.totalSkill,
                     )}
                   </div>
                   <div className="text-sm text-gray-600">차이</div>
