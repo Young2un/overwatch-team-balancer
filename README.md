@@ -1,36 +1,221 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 오버워치 팀 밸런스 생성기
 
-## Getting Started
+오버워치 스크림을 위한 공정하고 균형잡힌 팀 매칭 시스템입니다. 플레이어의 역할, 스킬 레벨, 선호도를 고려하여 최적의 팀을 자동으로 생성합니다.
 
-First, run the development server:
+## 🎮 주요 기능
+
+### 1. **역할 균형 매칭**
+
+- TANK, DPS, SUPPORT 역할별로 균형잡힌 팀 구성
+- 각 역할별 정원: 탱커 1명, 딜러 2명, 힐러 2명 (팀당 5명)
+- 역할별 스킬 레벨을 고려한 그리디 알고리즘 기반 배치
+
+### 2. **플레이어 관리**
+
+- 플레이어 이름, 가능한 역할, 선호 역할 설정
+- 역할별 스킬 레벨(SR) 입력
+- 실시간 플레이어 추가/삭제/수정
+
+### 3. **랜덤 벤픽 시스템**
+
+- 오버워치 2 모든 영웅 지원
+- 역할당 최대 밴 수 설정
+- 포지션당 최대 밴 수 설정
+- 밴된 영웅 통계 및 요약 제공
+
+### 4. **전장 랜덤 선택**
+
+- 오버워치 2 모든 전장 지원
+- 전장 타입: ASSAULT, ESCORT, HYBRID, CONTROL, PUSH, FLASHPOINT
+- 시드 기반 결정적 랜덤 선택
+
+### 5. **밸런스 개선 알고리즘**
+
+- 같은 역할 플레이어 간 스왑을 통한 밸런스 최적화
+- 팀 간 스킬 레벨 차이 최소화
+- 최대 50회 스왑 시도로 최적의 조합 탐색
+
+### 6. **시드 기반 재현 가능한 결과**
+
+- 동일한 시드로 동일한 매칭 결과 생성
+- 랜덤 시드 자동 생성 기능
+- Linear Congruential Generator (LCG) 기반 결정적 난수 생성
+
+## 🛠️ 기술 스택
+
+- **프레임워크**: Next.js 15.5.2 (App Router)
+- **언어**: TypeScript 5
+- **UI**: React 19.1.0
+- **스타일링**: Tailwind CSS 4
+- **패키지 매니저**: pnpm 9.12.3
+
+## 📦 설치 및 실행
+
+### 사전 요구사항
+
+- Node.js 18 이상
+- pnpm 설치 (`npm install -g pnpm`)
+
+### 설치
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 의존성 설치
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 개발 서버 실행
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+브라우저에서 [http://localhost:3000](http://localhost:3000) 접속
 
-## Learn More
+### 프로덕션 빌드
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# 빌드
+pnpm build
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 프로덕션 서버 실행
+pnpm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📁 프로젝트 구조
 
-## Deploy on Vercel
+```
+overwatch/
+├── app/
+│   ├── layout.tsx          # 루트 레이아웃
+│   ├── page.tsx            # 홈 페이지 (scrim으로 리다이렉트)
+│   └── scrim/
+│       └── page.tsx        # 스크림 매칭 메인 페이지
+├── lib/
+│   └── match/
+│       ├── assign.ts       # 역할 균형 배정 알고리즘
+│       ├── banpick.ts      # 랜덤 벤픽 시스템
+│       ├── improve.ts      # 밸런스 개선 알고리즘
+│       ├── maps.ts         # 전장 데이터 및 선택
+│       ├── score.ts        # 밸런스 점수 계산
+│       ├── shuffle.ts      # 시드 기반 셔플
+│       ├── skill.ts        # 스킬 관련 유틸리티
+│       └── types.ts        # TypeScript 타입 정의
+├── public/                 # 정적 파일
+└── package.json
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎯 사용 방법
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 1. 플레이어 추가 및 설정
+
+- "플레이어 추가" 버튼을 클릭하여 새 플레이어 추가
+- 플레이어 이름 입력
+- 가능한 역할 선택 (TANK, DPS, SUPPORT 중 하나 이상)
+- 선호 역할 선택 (선택사항)
+- 각 역할별 스킬 레벨(SR) 입력
+
+### 2. 매칭 설정
+
+- **시드**: 매칭 결과를 재현하기 위한 시드 값 (같은 시드 = 같은 결과)
+- **랜덤 돌리기**: 새로운 랜덤 시드 생성
+- **개선 알고리즘 사용**: 체크 시 밸런스 개선 알고리즘 적용
+
+### 3. 랜덤 벤픽 설정
+
+- **랜덤벤픽 사용**: 체크 시 랜덤 벤픽 활성화
+- **역할당 최대 밴 수**: 각 역할(TANK, DPS, SUPPORT)당 최대 밴 수 (0-5)
+- **포지션당 최대 밴 수**: 각 포지션당 최대 밴 수 (0-4)
+
+### 4. 매치 생성
+
+- "매치 생성" 버튼 클릭
+- 결과 확인:
+  - 선택된 전장 정보
+  - 밴된 영웅 목록 및 통계
+  - A팀/B팀 구성 및 스킬 합계
+  - 관전자 목록 (인원이 10명 초과 시)
+  - 밸런스 정보 및 경고 메시지
+
+## 🔧 주요 알고리즘
+
+### 역할 균형 배정 (roleBalancedAssign)
+
+1. 시드 기반으로 플레이어 셔플
+2. 각 역할별로 플레이어를 선호자/일반자로 분류
+3. 역할별 스킬 내림차순 정렬
+4. 각 역할별로 그리디 알고리즘으로 팀 배정
+   - 역할별 현재 스킬 합이 낮은 팀에 배정
+5. 남은 인원은 팀 총합 스킬을 고려하여 배정
+
+### 밸런스 개선 (improveBalance)
+
+1. 같은 역할 플레이어 간 스왑 시도
+2. 스왑 후 밸런스 점수 계산
+3. 개선되면 스왑 적용
+4. 최대 50회 시도 또는 더 이상 개선이 없을 때까지 반복
+
+### 시드 기반 셔플 (seededShuffle)
+
+- Linear Congruential Generator (LCG) 사용
+- 동일한 시드로 항상 동일한 결과 보장
+- Fisher-Yates 셔플 알고리즘 적용
+
+## 📊 데이터
+
+### 지원 영웅
+
+- **TANK**: 13명 (D.Va, 둠피스트, 라마트라, 라인하르트, 레킹볼, 로드호그, 마우가, 시그마, 오리사, 윈스턴, 자리야, 정커퀸, 해저드)
+- **DPS**: 20명 (겐지, 한조, 트레이서, 위도우메이커, 애쉬, 캐서디, 바스티온, 리퍼, 메이, 파라, 소전, 솔저: 76, 솜브라, 시메트라, 토르비욘, 정크랫, 에코, 벤처, 프레야, 벤데타)
+- **SUPPORT**: 12명 (아나, 바티스트, 브리기테, 루시우, 메르시, 모이라, 젠야타, 키리코, 라이프위버, 일리아리, 주노, 우양)
+
+### 지원 전장
+
+- **ASSAULT**: 한라산, 볼스카야 인더스트리, 아누비스 신전, 하나무라, 파리, 킹스 로우
+- **ESCORT**: 도라도, 리우데자네이루, 로테르담, 하바나, 리알토, 지브롤터
+- **HYBRID**: 할리우드, 누마니, 블리자드 월드, 에이헨발데, 킹스 로우, 미드타운
+- **CONTROL**: 부산, 일리오스, 리장 타워, 네팔, 오아시스
+- **PUSH**: 콜로세오, 뉴 퀸 스트리트, 에스페란사
+- **FLASHPOINT**: 수라바야, 뉴 주시
+
+## ⚠️ 주의사항
+
+- 플레이어는 최소 1개 이상의 역할을 선택해야 합니다
+- 각 역할별로 충분한 인원이 없으면 경고 메시지가 표시됩니다
+- 인원이 10명을 초과하면 초과 인원은 관전자로 배정됩니다
+- 시드 값이 같으면 항상 동일한 매칭 결과가 생성됩니다
+
+## 🎨 UI 특징
+
+- 반응형 디자인 (모바일, 태블릿, 데스크톱 지원)
+- 직관적인 사용자 인터페이스
+- 실시간 플레이어 관리
+- 상세한 매칭 결과 표시
+- 밴픽 통계 및 요약
+
+## 📅 주간 진행 상황
+
+### 1주차
+
+- 명세 둘러보고 고칠 점 정리
+- README 살짝 수정
+- 신규 영웅 추가
+- Vitest 써볼 예정이라는 생각
+
+### 2주차 (현재)
+
+- 현재 불필요한 기능들 컴포넌트 분리해서 주석처리
+- 플레이어 CURD 하기
+
+---
+
+## 📝 라이선스
+
+이 프로젝트는 개인 사용 목적으로 제작되었습니다.
+
+## 🤝 기여
+
+버그 리포트나 기능 제안은 이슈로 등록해주세요.
+
+---
+
+**건강하게 즐겜합시당!** 🎮
