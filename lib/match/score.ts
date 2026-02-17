@@ -13,7 +13,11 @@ export function calculateScore(teamA: Team, teamB: Team): number {
   const preferencePenalty =
     calculatePreferencePenalty(teamA) + calculatePreferencePenalty(teamB);
 
-  return skillDifference + preferencePenalty;
+  // 선호 영웅 겹침 패널티
+  const heroOverlapPenalty =
+    calculateHeroOverlapPenalty(teamA) + calculateHeroOverlapPenalty(teamB);
+
+  return skillDifference + preferencePenalty + heroOverlapPenalty;
 }
 
 /**
@@ -31,6 +35,28 @@ function calculatePreferencePenalty(team: Team): number {
     }
     return penalty;
   }, 0);
+}
+
+/**
+ * 팀 내 선호 영웅 겹침 패널티를 계산합니다.
+ */
+function calculateHeroOverlapPenalty(team: Team): number {
+  const allPreferredHeroes: string[] = [];
+  let penalty = 0;
+
+  for (const player of team.players) {
+    if (player.preferredHeroes && player.preferredHeroes.length > 0) {
+      for (const hero of player.preferredHeroes) {
+        if (allPreferredHeroes.includes(hero)) {
+          // 이미 누군가가 선호하는 영웅이면 패널티 부과 (꽤 큰 점수)
+          penalty += 500; 
+        } else {
+          allPreferredHeroes.push(hero);
+        }
+      }
+    }
+  }
+  return penalty;
 }
 
 /**
