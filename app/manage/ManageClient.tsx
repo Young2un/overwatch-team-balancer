@@ -84,7 +84,11 @@ export default function ManageClient({ initialPlayers }: ManageClientProps) {
       const newRoles = currentRoles.includes(role)
         ? currentRoles.filter((r) => r !== role)
         : [...currentRoles, role];
-      setEditingPlayer({ ...editingPlayer, roles: newRoles, skills: editingPlayer.skills });
+      setEditingPlayer({
+        ...editingPlayer,
+        roles: newRoles,
+        skills: editingPlayer.skills,
+      });
     } else {
       if (!newPlayer) return;
       const currentRoles = newPlayer.roles || [];
@@ -375,7 +379,6 @@ export default function ManageClient({ initialPlayers }: ManageClientProps) {
                 </div>
               </div>
             ) : (
-              // View Mode
               <>
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-bold text-lg text-gray-900">
