@@ -38,7 +38,7 @@ function calculateTeamTotalSkill(team: Team): number {
 export function roleBalancedAssign(
   players: Player[],
   seed: number,
-  banPickSettings?: RandomBanPick
+  _banPickSettings?: RandomBanPick
 ): MatchResult {
   // 플레이어를 시드 기반으로 셔플
   const shuffledPlayers = seededShuffle(players, seed);

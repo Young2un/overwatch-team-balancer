@@ -4,6 +4,8 @@ import { Player } from '@/lib/match/types';
 import { supabase } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 
+type PlayerRow = Omit<Player, 'preferredHeroes'> & { preferred_heroes: string[] };
+
 export async function getPlayers(): Promise<Player[]> {
   try {
     const { data, error } = await supabase.from('players').select('*').order('name');
@@ -11,7 +13,7 @@ export async function getPlayers(): Promise<Player[]> {
       console.error('Error fetching players:', error);
       return [];
     }
-    return (data as any[]).map(p => ({
+    return ((data ?? []) as PlayerRow[]).map((p) => ({
       ...p,
       preferredHeroes: p.preferred_heroes
     })) as Player[];
@@ -22,7 +24,7 @@ export async function getPlayers(): Promise<Player[]> {
 }
 
 export async function createPlayer(player: Player): Promise<void> {
-  const { id, preferredHeroes, ...rest } = player;
+  const { preferredHeroes, ...rest } = player;
   const playerData = { ...rest, preferred_heroes: preferredHeroes };
 
   try {

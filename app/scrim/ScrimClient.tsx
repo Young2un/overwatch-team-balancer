@@ -210,7 +210,7 @@ export default function ScrimClient({ initialPlayers }: ScrimClientProps) {
               </button>
             </div>
 
-            {players.map((player, index) => (
+            {players.map((player) => (
               <div
                 key={player.id}
                 className="border border-gray-200 rounded-lg p-4"
